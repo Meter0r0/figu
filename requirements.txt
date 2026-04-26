@@ -1,0 +1,42 @@
+# ============================================
+# OrcFotos-app - Dependencias Python
+# ============================================
+# Instalar con:
+#   python -m venv .venv
+#   source .venv/bin/activate   (macOS/Linux)
+#   .venv\Scripts\activate      (Windows)
+#   pip install -r requirements.txt
+# ============================================
+
+# --- Procesamiento de imágenes ---
+Pillow==11.3.0
+opencv-python==4.12.0.88
+opencv-contrib-python==4.10.0.84
+numpy==1.26.4
+
+# --- Generación de PDFs ---
+reportlab==4.4.10
+
+# --- OCR (PaddleOCR) ---
+paddlepaddle==3.0.0
+paddleocr==3.4.0
+
+# --- IA Generativa (Gemini / Google) ---
+google-genai==1.47.0
+google-generativeai==0.8.6
+google-api-python-client==2.193.0
+google-auth==2.49.1
+google-auth-httplib2==0.3.0
+
+# --- Inpainting (borrar_marca.py) ---
+simple-lama-inpainting==0.1.0
+cloudinary==1.44.1
+
+# --- QR ---
+qrcode==8.2
+
+# --- Utilidades ---
+requests==2.32.5
+tqdm==4.67.3
+pydantic==2.12.5
+PyYAML==6.0.2
