@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Spinner personalizado color NARANJA */
+      .loader {
+        border-top-color: #ea580c; /* orange-600 */
+        -webkit-animation: spinner 1.5s linear infinite;
+        animation: spinner 1.5s linear infinite;
+      }
+      @-webkit-keyframes spinner {
+        0% { -webkit-transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(360deg); }
+      }
+      @keyframes spinner {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      /* Ajuste para selects en modo oscuro para que las opciones se vean bien */
+      select option {
+        background-color: #1f2937; /* gray-800 */
+        color: white;
+      }
+    </style>
+  </head>
+  <body class="bg-black flex items-center justify-center min-h-screen">
+    
+    <div class="w-full max-w-lg p-8 space-y-6 bg-gray-900 rounded-xl shadow-2xl m-4 border border-gray-800">
+      
+      <div class="text-center">
+        <h1 class="text-3xl font-bold text-white">Registro de Cobro</h1>
+        <p class="text-orange-500 mt-2 font-medium">Club Olivos - Cena de Hockey - Categorías 7A, 7B, 6A y 6B (2026)</p>
+      </div>
+
+      <form id="paymentForm" class="space-y-6">
+        
+        <div>
+          <label for="cobrador" class="block text-sm font-medium text-gray-300">Cobrador</label>
+          <select id="cobrador" name="cobrador" required class="mt-1 block w-full px-3 py-2 bg-gray-800 border border-gray-700 text-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 sm:text-sm">
+            <option value="" disabled selected>Seleccione un cobrador</option>
+            <option>Martin</option>
+            <option>Fortu</option>
+            <option>Fran</option>
+            <option>Augusto</option>
+          </select>
+        </div>
+        
+        <div>
+          <label for="categoria" class="block text-sm font-medium text-gray-300">Categoría</label>
+          <select id="categoria" name="categoria" required class="mt-1 block w-full px-3 py-2 bg-gray-800 border border-gray-700 text-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 sm:text-sm">
+            <option value="" disabled selected>Seleccione una categoría</option>
+            <option>7A</option>
+            <option>7B</option>
+            <option>6A</option>
+            <option>6B</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="nombre" class="block text-sm font-medium text-gray-300">Nombre de quien paga</label>
+          <input type="text" id="nombre" name="nombre" required class="mt-1 block w-full px-3 py-2 bg-gray-800 border border-gray-700 text-white rounded-md shadow-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 sm:text-sm" placeholder="Ej: Juan Pérez">
+        </div>
+
+        <div>
+          <label for="cantidad" class="block text-sm font-medium text-gray-300">Cantidad de Comensales (total)</label>
+          <input type="number" id="cantidad" name="cantidad" required min="1" step="1" oninput="updateMontoCalculado()" onchange="updateMontoCalculado()" class="mt-1 block w-full px-3 py-2 bg-gray-800 border border-gray-700 text-white rounded-md shadow-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 sm:text-sm" placeholder="Incluído quien paga">
+        </div>
+
+        <div class="p-4 bg-gray-800 border border-gray-700 rounded-lg text-center">
+          <p class="text-sm font-medium text-gray-400">Monto a Pagar:</p>
+          <p id="montoCalculadoDisplay" class="text-3xl font-bold text-orange-500">$0</p>
+          <input type="hidden" id="montoCalculado" name="montoCalculado">
+        </div>
+
+        <div>
+          <label for="montoCobrado" class="block text-sm font-medium text-gray-300">Monto Cobrado (ARS)</label>
+          <input type="number" id="montoCobrado" name="montoCobrado" required min="0" step="1" class="mt-1 block w-full px-3 py-2 bg-gray-800 border border-gray-700 text-white rounded-md shadow-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 sm:text-sm" placeholder="Ingrese el monto recibido">
+        </div>
+
+        <div>
+          <button type="submit" id="submitButton" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-bold text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition duration-150 ease-in-out">
+            <span id="buttonText">Guardar Registro</span>
+            <div id="loader" class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-5 w-5 hidden"></div>
+          </button>
+        </div>
+      </form>
+      
+      <div id="status" class="mt-4 text-center text-sm"></div>
+
+      <p class="text-center text-gray-600 text-xs mt-6">v1.1</p>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div id="successModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/80 px-4 py-8 backdrop-blur-sm shadow-2xl">
+      <div class="bg-gray-900 border border-gray-700 rounded-xl p-6 max-w-sm w-full text-center shadow-2xl relative animate-bounce-short">
+        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-900/50 mb-4">
+           <svg class="h-10 w-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        </div>
+        <h2 class="text-2xl font-bold text-white mb-2">¡Pago Registrado!</h2>
+        <div class="bg-gray-800 p-4 rounded-lg my-4 text-left border border-gray-700 shadow-inner">
+           <p class="text-xs text-gray-400 uppercase tracking-wider text-center">Recibo N°</p>
+           <p id="modalReceiptId" class="text-3xl font-mono text-orange-500 font-bold tracking-widest text-center mt-1"></p>
+           <hr class="border-gray-700 my-3">
+           <p class="text-sm text-gray-300 py-1"><strong>Nombre:</strong> <span id="modalName" class="text-white"></span></p>
+           <p class="text-sm text-gray-300 py-1"><strong>Monto:</strong> <span class="text-white">$</span><span id="modalAmount" class="text-white"></span></p>
+        </div>
+        <button id="modalWappBtn" onclick="compartirWhatsApp()" class="w-full flex justify-center items-center px-4 py-3 bg-[#25D366] hover:bg-[#128C7E] text-white rounded-md transition-colors font-bold shadow-lg mt-2 text-lg">
+          📲 Compartir por WhatsApp
+        </button>
+        <button onclick="closeModal()" class="w-full mt-4 py-3 border border-gray-600 text-gray-300 font-bold rounded-md hover:bg-gray-800 transition">
+          Cerrar e Iniciar nuevo
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // --- Configuración (Mantenemos el precio de 15.000) ---
+      const PRECIO_POR_PERSONA = 15000;
+
+      // --- Elementos del DOM ---
+      const form = document.getElementById('paymentForm');
+      const cantidadInput = document.getElementById('cantidad');
+      const montoCalculadoDisplay = document.getElementById('montoCalculadoDisplay');
+      const montoCalculadoInput = document.getElementById('montoCalculado');
+      const statusDiv = document.getElementById('status');
+      const submitButton = document.getElementById('submitButton');
+      const buttonText = document.getElementById('buttonText');
+      const loader = document.getElementById('loader');
+
+      function updateMontoCalculado() {
+        const cantidad = parseInt(cantidadInput.value) || 0;
+        const total = cantidad * PRECIO_POR_PERSONA;
+        
+        const formatter = new Intl.NumberFormat('es-AR', {
+          style: 'currency',
+          currency: 'ARS',
+          minimumFractionDigits: 0
+        });
+        
+        montoCalculadoDisplay.textContent = formatter.format(total);
+        montoCalculadoInput.value = total;
+        // Se autocompleta el campo de monto a cobrar para evitar que el usuario deba tippearlo siempre
+        document.getElementById('montoCobrado').value = total;
+      }
+
+      // Los eventos de actualización están inline en el HTML (oninput/onchange)
+      // para mayor compatibilidad con celulares dentro del sandbox de Apps Script.
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault(); 
+        setLoading(true);
+        statusDiv.innerHTML = '';
+        statusDiv.className = 'mt-4 text-center text-sm';
+
+        const formData = {
+          cobrador: document.getElementById('cobrador').value,
+          categoria: document.getElementById('categoria').value,
+          nombre: document.getElementById('nombre').value,
+          cantidad: document.getElementById('cantidad').value,
+          montoCalculado: document.getElementById('montoCalculado').value,
+          montoCobrado: document.getElementById('montoCobrado').value,
+        };
+        
+        google.script.run
+          .withSuccessHandler(handleSuccess)
+          .withFailureHandler(handleFailure)
+          .processForm(formData);
+      });
+
+      // Variable global para guardar la URL de WhatsApp del último recibo
+      var ultimaWappUrl = '';
+
+      function handleSuccess(response) {
+        setLoading(false);
+        
+        // Cargar datos en el modal
+        document.getElementById('modalReceiptId').textContent = response.recibo;
+        document.getElementById('modalName').textContent = response.nombre;
+        document.getElementById('modalAmount').textContent = response.monto;
+        
+        var wappText = '*Cena de Hockey - Club Olivos*\n' +
+          '✅ Pago registrado.\n' +
+          '👤 Nombre: ' + response.nombre + '\n' +
+          '💰 Monto: $' + response.monto + '\n' +
+          '🧾 *Recibo N°: ' + response.recibo + '*';
+        ultimaWappUrl = 'https://wa.me/?text=' + encodeURIComponent(wappText);
+
+        // Mostrar el modal
+        statusDiv.innerHTML = '';
+        document.getElementById('successModal').classList.remove('hidden');
+      }
+
+      function compartirWhatsApp() {
+        if (ultimaWappUrl) {
+          var w = window.open(ultimaWappUrl, '_top');
+          if (!w) {
+            // Fallback: si window.open falla, redirigimos directamente
+            window.top.location.href = ultimaWappUrl;
+          }
+        }
+      }
+
+      function closeModal() {
+        document.getElementById('successModal').classList.add('hidden');
+        form.reset();
+        montoCalculadoDisplay.textContent = '$0'; 
+      }
+
+      function handleFailure(error) {
+        setLoading(false);
+        showStatus(error.message, 'error', false);
+      }
+      
+      let statusTimeout;
+      function showStatus(message, type, isHTML = false) {
+        if (isHTML) {
+          statusDiv.innerHTML = message;
+        } else {
+          statusDiv.textContent = message;
+        }
+        
+        statusDiv.className = type === 'success' 
+          ? 'text-green-400 p-4 bg-green-900/40 border border-green-800 rounded-lg shadow-inner mt-4'
+          : 'text-red-400 font-medium p-3 bg-red-900/50 border border-red-800 rounded-md mt-4';
+        
+        if (statusTimeout) {
+          clearTimeout(statusTimeout);
+        }
+
+        // Si es error, lo ocultamos a los 6s. Si es success lo dejamos para que comparta el recibo.
+        if (type === 'error') {
+          statusTimeout = setTimeout(() => {
+            statusDiv.innerHTML = '';
+            statusDiv.className = 'mt-4 text-center text-sm';
+          }, 6000);
+        }
+      }
+      
+      function setLoading(isLoading) {
+        submitButton.disabled = isLoading;
+        buttonText.classList.toggle('hidden', isLoading);
+        loader.classList.toggle('hidden', !isLoading);
+        // Cambio visual para botón deshabilitado
+        if(isLoading) {
+           submitButton.classList.add('opacity-75', 'cursor-not-allowed');
+        } else {
+           submitButton.classList.remove('opacity-75', 'cursor-not-allowed');
+        }
+      }
+    </script>
+  </body>
+</html>
