@@ -1,0 +1,42 @@
+# === macOS ===
+.DS_Store
+._*
+
+# === Python ===
+.venv/
+__pycache__/
+*.pyc
+
+# === Carpetas de fotos y pruebas ===
+01_ALBUM-FIGURITAS/
+02_ALBUM-FiGURITAS01/
+03_FOTOS-PARA-QR/
+99_FOTOS-TODAS/
+FOTOS-PARA-QR2/
+Photos-3-001/
+Prueba1/
+Prueba2/
+Prueba3/
+PruebaProcer/
+fotos_prueba/
+debug_procer/
+zzz_ARESOLVER!/
+models/
+
+# === Archivos de datos / output generado ===
+*.csv
+*.pdf
+*.jpg
+*.jpeg
+*.png
+*.heic
+
+# === Binarios compilados ===
+vision_ocr
+zbar.tar.gz
+
+# === Archivos de test ===
+test.py
+test_exif.jpg
+test_sips.jpg
+test_meta.jpg
